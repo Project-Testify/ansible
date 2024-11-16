@@ -1,0 +1,52 @@
+---
+  - hosts: server1
+    become: yes
+    tasks:
+      - name: Install dnf-utils
+        dnf:
+          name: dnf-utils
+          state: present
+  
+      - name: Add Docker CE repository using command
+        ansible.builtin.command:
+          cmd: dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo
+
+  
+      - name: Install Docker and plugins
+        dnf:
+          name:
+            - docker-ce
+            - docker-ce-cli
+            - containerd.io
+            - docker-buildx-plugin
+            - docker-compose-plugin
+          state: present
+  
+      - name: Start and enable Docker service
+        systemd:
+          name: docker
+          state: started
+          enabled: yes
+
+          
+      - name: Install Nginx service
+        dnf:
+          name: nginx
+          state: present
+
+      - name: Copy Nginx configuration file
+        copy:
+          src: nginx.conf
+          dest: /etc/nginx/nginx.conf
+          owner: root
+          group: root
+
+      - name: Start and enable Nginx service
+        systemd:
+          name: nginx
+          state: started
+          enabled: yes
+
+
+          
+  
