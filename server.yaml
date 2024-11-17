@@ -1,5 +1,5 @@
 ---
-  - hosts: server1
+  - hosts: server
     become: yes
     tasks:
       - name: Install dnf-utils
@@ -46,6 +46,32 @@
           name: nginx
           state: started
           enabled: yes
+
+
+      - name: Install Git
+        dnf:
+          name: git
+          state: present
+
+      - name: Clone the repository
+        git:
+          repo: https://github.com/Project-Testify/Testify.git
+          dest: /opt/Testify
+          update: yes
+          
+
+      # Run docker compose with environment
+      - name: Copy .env file to the project directory
+        copy:
+          src: .env
+          dest: /opt/Testify/.env
+
+      - name: Run docker-compose
+        ansible.builtin.command:
+          cmd: docker compose up -d
+        args:
+          chdir: /opt/Testify
+
 
 
           
